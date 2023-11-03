@@ -3,44 +3,64 @@ import { StyleSheet, View } from 'react-native'
 import { Button, Text, TextInput } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
 
-export default function FormPessoa({ navigation, route }) {
+export default function FormPessoaAsyncStorage({ navigation, route }) {
 
-    const { Acao, PessoaAntiga: pessoaAntiga } = route.params
+    const { acao, pessoa: pessoaAntiga } = route.params
 
     const [NomE, setNomE] = useState('')
     const [IdadE, setIdadE] = useState('')
     const [PesO, setPesO] = useState('')
     const [AlturA, setAlturA] = useState('')
 
-    const [MostrarMensagemErro, setMostrarMensagemErro] = useState(false)
+    const [showMensagemErro, setShowMensagemErro] = useState(false)
+
 
     useEffect(() => {
+
+        console.log('pessoa -> ', pessoaAntiga)
+
         if (pessoaAntiga) {
             setNomE(pessoaAntiga.NomE)
             setIdadE(pessoaAntiga.IdadE)
             setPesO(pessoaAntiga.PesO)
             setAlturA(pessoaAntiga.AlturA)
         }
+
     }, [])
 
-    function Salvar() {
-        if (NomE === '' || IdadE === '' || PesO === '' || AlturA === '') {
-            setMostrarMensagemErro(true)
-        } else {
-            setMostrarMensagemErro(false)
 
-            const NovaPessoa = {
+    function salvar() {
+
+        if (NomE === '' || IdadE === '' || PesO === '' || AlturA === '') {
+            setShowMensagemErro(true)
+        } else {
+            setShowMensagemErro(false)
+
+            const novaPessoa = {
                 NomE: NomE,
                 IdadE: IdadE,
                 PesO: PesO,
                 AlturA: AlturA
             }
 
+            const objetoEmString = JSON.stringify(novaPessoa)
+            console.log("🚀 ~ file: FormPessoa.js:47 ~ salvar ~ objetoEmString:", objetoEmString)
+
+            console.log(typeof (objetoEmString))
+
+            const objeto = JSON.parse(objetoEmString)
+            console.log("🚀 ~ file: FormPessoa.js:52 ~ salvar ~ objeto:", objeto)
+
+            console.log(typeof (objeto))
+
+
             if (pessoaAntiga) {
-                Acao(pessoaAntiga, NovaPessoa)
+                acao(pessoaAntiga, novaPessoa)
             } else {
-                Acao(NovaPessoa)
+                acao(novaPessoa)
             }
+
+
 
             Toast.show({
                 type: 'success',
@@ -49,11 +69,15 @@ export default function FormPessoa({ navigation, route }) {
 
             navigation.goBack()
         }
+
     }
+
 
     return (
         <View style={styles.container}>
-            <Text variant='titleLarge' style={styles.title}>{pessoaAntiga ? 'Editar Pessoa' : 'Adicionar Pessoa'}</Text>
+
+            <Text variant='titleLarge' style={styles.title} >{pessoaAntiga ? 'Editar Pessoa' : 'Adicionar Pessoa'}</Text>
+
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -61,8 +85,9 @@ export default function FormPessoa({ navigation, route }) {
                     mode='outlined'
                     value={NomE}
                     onChangeText={text => setNomE(text)}
-                    onFocus={() => setMostrarMensagemErro(false)}
+                    onFocus={() => setShowMensagemErro(false)}
                 />
+
                 <TextInput
                     style={styles.input}
                     label={'IdadE'}
@@ -70,8 +95,9 @@ export default function FormPessoa({ navigation, route }) {
                     keyboardType='numeric'
                     value={IdadE}
                     onChangeText={text => setIdadE(text)}
-                    onFocus={() => setMostrarMensagemErro(false)}
+                    onFocus={() => setShowMensagemErro(false)}
                 />
+
                 <TextInput
                     style={styles.input}
                     label={'PesO | KG'}
@@ -79,8 +105,9 @@ export default function FormPessoa({ navigation, route }) {
                     keyboardType='numeric'
                     value={PesO}
                     onChangeText={text => setPesO(text)}
-                    onFocus={() => setMostrarMensagemErro(false)}
+                    onFocus={() => setShowMensagemErro(false)}
                 />
+
                 <TextInput
                     style={styles.input}
                     label={'AlturA | cm'}
@@ -88,13 +115,18 @@ export default function FormPessoa({ navigation, route }) {
                     keyboardType='numeric'
                     value={AlturA}
                     onChangeText={text => setAlturA(text)}
-                    onFocus={() => setMostrarMensagemErro(false)}
+                    onFocus={() => setShowMensagemErro(false)}
                 />
-                {MostrarMensagemErro &&
-                    <Text style={{ color: 'red', textAlign: 'center' }}>todos os campos!</Text>
+
+                {showMensagemErro &&
+                    <Text style={{ color: 'red', textAlign: 'center' }}>Preencha todos os campos!</Text>
                 }
+
+
             </View>
+
             <View style={styles.buttonContainer}>
+
                 <Button
                     style={styles.button}
                     mode='contained-tonal'
@@ -102,14 +134,20 @@ export default function FormPessoa({ navigation, route }) {
                 >
                     Voltar
                 </Button>
+
                 <Button
                     style={styles.button}
                     mode='contained'
-                    onPress={Salvar}
+                    onPress={salvar}
                 >
                     Salvar
                 </Button>
+
+
             </View>
+
+
+
         </View>
     )
 }
